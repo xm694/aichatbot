@@ -1,0 +1,11 @@
+langchain
+langchain_core
+langchain_openai
+langchain_chroma
+langchain-community
+sqlalchemy
+psycopg2-binary
+pandas
+
+
+
