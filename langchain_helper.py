@@ -25,15 +25,23 @@ import re
 
 config = get_api_configuration()
 
-if config["openai_api_key"]:
+if config["openai_api_key"] and config["langchain_api_key"]:
     llm = ChatOpenAI(model="gpt-4o-mini", temperature=0, api_key=config["openai_api_key"])
 
-if config["langchain_api_key"]:
     LANGCHAIN_TRACING_V2="true"
     LANGCHAIN_ENDPOINT="https://api.smith.langchain.com"
     # LANGCHAIN_API_KEY = os.getenv("LANGCHAIN_API_KEY")
     LANGCHAIN_API_KEY = config["langchain_api_key"]
     LANGCHAIN_PROJECT="database-chatbot"
+
+    """CSV helper"""
+    def csv_agent(df):
+        csv_agent = create_pandas_dataframe_agent(
+            llm,
+            df=df,
+            agent_type = "openai-tools", verbose=True, allow_dangerous_code = True
+        )
+        return csv_agent
 
 """database will be disable due to the configuration issue with local database on streamlit cloud"""
 # #DB connect in local enviromen
@@ -119,16 +127,6 @@ if config["langchain_api_key"]:
 #         | StrOutputParser()
 #     )
 #     return ans_chain
-
-"""CSV helper"""
-def csv_agent(df):
-    csv_agent = create_pandas_dataframe_agent(
-        llm=llm,
-        df=df,
-        agent_type = "openai-tools", verbose=True, allow_dangerous_code = True
-    )
-    return csv_agent
-
 
 # todos:
 # report: generate daily report if user click on generate report button
