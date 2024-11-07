@@ -1,3 +1,4 @@
+import streamlit as st
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
@@ -16,7 +17,7 @@ import dotenv
 import re
 
 
-from conn import create_db
+#from conn import create_db
 
 # configure credentials for openai and langchain
 # dotenv.load_dotenv()
@@ -34,7 +35,12 @@ if config["langchain_api_key"]:
     LANGCHAIN_API_KEY = config["langchain_api_key"]
     LANGCHAIN_PROJECT="database-chatbot"
 
-db = create_db()
+#DB connect in local enviromen
+#db = create_db()
+
+#DB connect on streamlit cloud
+db = st.connection("postgresql", type="sql")
+
 #get table context info for prompt
 get_table_info = db.get_context()["table_info"]
 #prompts engineering
