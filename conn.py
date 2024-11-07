@@ -1,4 +1,3 @@
-import pandas as pd
 from sqlalchemy import create_engine, text
 from langchain import SQLDatabase
 from dotenv import load_dotenv

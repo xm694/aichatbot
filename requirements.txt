@@ -3,8 +3,10 @@ langchain_core
 langchain_openai
 langchain_chroma
 langchain-community
+langchain_experimental
 sqlalchemy
 psycopg2-binary
+operator
 pandas
 
 
