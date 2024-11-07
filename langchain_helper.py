@@ -17,7 +17,7 @@ import dotenv
 import re
 
 
-#from conn import create_db
+from conn import create_db
 
 # configure credentials for openai and langchain
 # dotenv.load_dotenv()
@@ -35,92 +35,90 @@ if config["langchain_api_key"]:
     LANGCHAIN_API_KEY = config["langchain_api_key"]
     LANGCHAIN_PROJECT="database-chatbot"
 
-#DB connect in local enviromen
-#db = create_db()
+"""database will be disable due to the configuration issue with local database on streamlit cloud"""
+# #DB connect in local enviromen
+# db = create_db()
 
-#DB connect on streamlit cloud
-db = st.connection("postgresql", type="sql")
-
-#get table context info for prompt
-get_table_info = db.get_context()["table_info"]
+# #get table context info for prompt
+# get_table_info = db.get_context()["table_info"]
 #prompts engineering
-sql_template = """You are a PostgreSQL expert. Given an input question, first create a syntactically correct PostgreSQL query to run, ONLY the SQL query without prefix "SQLQuery: ".
-, then look at the results of the query and return the answer to the input question.
-    Unless the user specifies in the question a specific number of examples to obtain, query for at most {top_k} results using the LIMIT clause as per PostgreSQL. You can order the results to return the most informative data in the database.
-    Never query for all columns from a table. You must query only the columns that are needed to answer the question. Wrap each column name in double quotes (") to denote them as delimited identifiers.
-    Pay attention to use only the column names you can see in the tables below. Be careful to not query for columns that do not exist. Also, pay attention to which column is in which table.
-    Pay attention to use CURRENT_DATE function to get the current date, if the question involves "today".
+# sql_template = """You are a PostgreSQL expert. Given an input question, first create a syntactically correct PostgreSQL query to run, ONLY the SQL query without prefix "SQLQuery: ".
+# , then look at the results of the query and return the answer to the input question.
+#     Unless the user specifies in the question a specific number of examples to obtain, query for at most {top_k} results using the LIMIT clause as per PostgreSQL. You can order the results to return the most informative data in the database.
+#     Never query for all columns from a table. You must query only the columns that are needed to answer the question. Wrap each column name in double quotes (") to denote them as delimited identifiers.
+#     Pay attention to use only the column names you can see in the tables below. Be careful to not query for columns that do not exist. Also, pay attention to which column is in which table.
+#     Pay attention to use CURRENT_DATE function to get the current date, if the question involves "today".
 
-    Use the following format:
+#     Use the following format:
 
-    Question: Question here
-    SQLQuery: SQL Query to run, NO MARKDOWN, NO EXPLANATION
-    SQLResult: Result of the SQLQuery
-    Answer: Final answer here
+#     Question: Question here
+#     SQLQuery: SQL Query to run, NO MARKDOWN, NO EXPLANATION
+#     SQLResult: Result of the SQLQuery
+#     Answer: Final answer here
 
-    Referent to the relavant database information:
-    {table_info}
+#     Referent to the relavant database information:
+#     {table_info}
 
-    Question: {input}
+#     Question: {input}
 
-    """
+#     """
 
-SQL_PROMPT = PromptTemplate(
-    template = sql_template,
-    input_variables = ["input"],
-    partial_variables = {"table_info":get_table_info, "top_k":3},
-    )
+# SQL_PROMPT = PromptTemplate(
+#     template = sql_template,
+#     input_variables = ["input"],
+#     partial_variables = {"table_info":get_table_info, "top_k":3},
+#     )
 
-# prompt for generate final answer based on sql query result
-answer_prompt = PromptTemplate.from_template(
-    """Given the following user question, corresponding SQL query, and SQL result, answer the user question.
+# # prompt for generate final answer based on sql query result
+# answer_prompt = PromptTemplate.from_template(
+#     """Given the following user question, corresponding SQL query, and SQL result, answer the user question.
 
-    Question: {question}
-    SQL Query: {query}
-    SQL Result: {result}
-    Answer: """
-    )
+#     Question: {question}
+#     SQL Query: {query}
+#     SQL Result: {result}
+#     Answer: """
+#     )
 
-#sql extract helper function
-def extract_sql_query(output):
-    # Use regex to find the SQL query
-    match = re.search(r'SQLQuery:\s*(.*?)(?:\nSQLResult:|$)', output, re.DOTALL)
-    if match:
-        # Extract the query and remove any leading/trailing whitespace
-        sql_query = match.group(1).strip()
-        return sql_query
-    else:
-        raise ValueError("No SQL query found in the output")
+# #sql extract helper function
+# def extract_sql_query(output):
+#     # Use regex to find the SQL query
+#     match = re.search(r'SQLQuery:\s*(.*?)(?:\nSQLResult:|$)', output, re.DOTALL)
+#     if match:
+#         # Extract the query and remove any leading/trailing whitespace
+#         sql_query = match.group(1).strip()
+#         return sql_query
+#     else:
+#         raise ValueError("No SQL query found in the output")
 
-# Steps for SQL Q&A
-# # step 1: read database schema image from user upload
-# def read_image(image_url):
-#     #code to use multimodal input - image to text
-#     image_data = base64.b64encode(httpx.get(image_url).content).decode("utf-8")
-#     return image_data
+# # Steps for SQL Q&A
+# # # step 1: read database schema image from user upload
+# # def read_image(image_url):
+# #     #code to use multimodal input - image to text
+# #     image_data = base64.b64encode(httpx.get(image_url).content).decode("utf-8")
+# #     return image_data
 
-# step 2: generate sql query based on user input and database schema
-def generate_sql_query():
-    if db is None:
-        raise ValueError("Failed to connect to database.")
-    db_chain = create_sql_query_chain(llm, db, SQL_PROMPT)
-    return db_chain
+# # step 2: generate sql query based on user input and database schema
+# def generate_sql_query():
+#     if db is None:
+#         raise ValueError("Failed to connect to database.")
+#     db_chain = create_sql_query_chain(llm, db, SQL_PROMPT)
+#     return db_chain
 
-#step 3: answer question in natural language
-def answer_question():
-    if db is None:
-        raise ValueError("Failed to connect to database.")
-    write_query = generate_sql_query()
-    execute_query = QuerySQLDataBaseTool(db=db)
-    ans_chain = (
-        RunnablePassthrough.assign(query= write_query).assign(
-            result=itemgetter("query") | execute_query
-        )
-        | answer_prompt
-        | llm
-        | StrOutputParser()
-    )
-    return ans_chain
+# #step 3: answer question in natural language
+# def answer_question():
+#     if db is None:
+#         raise ValueError("Failed to connect to database.")
+#     write_query = generate_sql_query()
+#     execute_query = QuerySQLDataBaseTool(db=db)
+#     ans_chain = (
+#         RunnablePassthrough.assign(query= write_query).assign(
+#             result=itemgetter("query") | execute_query
+#         )
+#         | answer_prompt
+#         | llm
+#         | StrOutputParser()
+#     )
+#     return ans_chain
 
 """CSV helper"""
 def csv_agent(df):
