@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from langchain_helper import generate_sql_query, answer_question
+from langchain_helper import generate_sql_query, answer_question, csv_agent
 
 
 def main():
@@ -10,9 +10,10 @@ def main():
 
     #streamlit sidebar input csv file
     st.sidebar.header("Upload CSV File (optional)")
-    csv = st.sidebar.file_uploader("csv file")
+    csv = st.sidebar.file_uploader("csv file", type="csv")
     if csv:
         st.write("CSV File:", csv.name)
+        user_df = pd.read_csv(csv)
 
     #streamlit sidebar input database schema png
     st.sidebar.header("Database Schema (optional)")
@@ -23,6 +24,17 @@ def main():
 
     #streamlit main page input user query
     user_input = st.text_input("Ask a question that is related to your dataset")
+
+
+    if st.button("Chat with CSV"):
+        try:
+            csv_bot = csv_agent(user_df)
+            csv_answer = csv_bot.invoke({"input":user_input})
+            st.title("Answer from CSV")
+            st.write(csv_answer)
+        except ValueError as e:
+            st.error(f"Error: {e}")
+
 
     #streamlit main page button to generate sql query
     if st.button("Generate SQL Query"):
@@ -39,7 +51,9 @@ def main():
         except ValueError as e:
             st.error(f"Error: {e}")
 
+    #st.button("Generate Report")
 
+    st.write("this schema image is for demo purpose")
     st.image("database_schema.png", caption="database schema image")
 
 

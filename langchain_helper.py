@@ -6,12 +6,14 @@ from langchain_core.example_selectors import SemanticSimilarityExampleSelector
 from langchain.chains import create_sql_query_chain
 from langchain_community.tools.sql_database.tool import QuerySQLDataBaseTool
 
+#langchain csv experiment
+from langchain_experimental.agents import create_pandas_dataframe_agent
+
 from operator import itemgetter
 import os
 import dotenv
 import re
-import base64
-import httpx
+
 
 from conn import create_db
 
@@ -107,10 +109,17 @@ def answer_question():
     )
     return ans_chain
 
+"""CSV helper"""
+def csv_agent(df):
+    csv_agent = create_pandas_dataframe_agent(
+        llm,
+        df=df,
+        agent_type = "openai-tools", verbose=True, allow_dangerous_code = True
+    )
+    return csv_agent
 
 
-
-
+# todos:
 # report: generate daily report if user click on generate report button
 """User can choose to generate a daily report, if "generate report button" be clicked,
 app need to retrieved relevant data from the database and plot data into charts,
@@ -126,3 +135,5 @@ user will get a pre-formatted report including charts and summary"""
 
 #     report = response.choices[0].text.strip()
 #     return report
+
+
