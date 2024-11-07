@@ -1,7 +1,8 @@
 import streamlit as st
 from keys_manager import render_api_key_form, get_api_configuration
 import pandas as pd
-from langchain_helper import generate_sql_query, answer_question, csv_agent
+# from langchain_helper import generate_sql_query, answer_question, csv_agent
+from langchain_helper import csv_agent
 
 
 def main():
@@ -40,19 +41,19 @@ def main():
 
 
     #streamlit main page button to generate sql query
-    if st.button("Generate SQL Query"):
-        try:
-            sql_chain = generate_sql_query()
-            sql_query = sql_chain.invoke({"question":user_input})
-            st.title("SQL Query")
-            st.code(sql_query)
+    # if st.button("Generate SQL Query"):
+    #     try:
+    #         sql_chain = generate_sql_query()
+    #         sql_query = sql_chain.invoke({"question":user_input})
+    #         st.title("SQL Query")
+    #         st.code(sql_query)
 
-            ans_chain = answer_question()
-            answer = ans_chain.invoke({"question":user_input})
-            st.title("Answer")
-            st.write(answer)
-        except ValueError as e:
-            st.error(f"Error: {e}")
+    #         ans_chain = answer_question()
+    #         answer = ans_chain.invoke({"question":user_input})
+    #         st.title("Answer")
+    #         st.write(answer)
+    #     except ValueError as e:
+    #         st.error(f"Error: {e}")
 
     #st.button("Generate Report")
 
