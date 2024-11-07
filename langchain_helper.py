@@ -123,7 +123,7 @@ if config["langchain_api_key"]:
 """CSV helper"""
 def csv_agent(df):
     csv_agent = create_pandas_dataframe_agent(
-        llm,
+        llm=llm,
         df=df,
         agent_type = "openai-tools", verbose=True, allow_dangerous_code = True
     )
