@@ -1,9 +1,12 @@
 import streamlit as st
+from keys_manager import render_api_key_form, get_api_configuration
 import pandas as pd
 from langchain_helper import generate_sql_query, answer_question, csv_agent
 
 
 def main():
+    render_api_key_form()
+
     st.title("Chat with your Data")
     st.write("This app allows you to ask questions about your data and generate a report based on the data.")
     st.write("The sample database is 'Chinook' in postgres sql")

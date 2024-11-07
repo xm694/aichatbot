@@ -10,6 +10,7 @@ from langchain_community.tools.sql_database.tool import QuerySQLDataBaseTool
 from langchain_experimental.agents import create_pandas_dataframe_agent
 
 from operator import itemgetter
+from keys_manager import get_api_configuration
 import os
 import dotenv
 import re
@@ -18,13 +19,17 @@ import re
 from conn import create_db
 
 # configure credentials for openai and langchain
-dotenv.load_dotenv()
-openai_api_key = os.getenv("OPENAI_API_KEY")
-llm = ChatOpenAI(model="gpt-4o-mini", temperature=0, api_key=openai_api_key)
+# dotenv.load_dotenv()
+# openai_api_key = os.getenv("OPENAI_API_KEY")
+
+config = get_api_configuration()
+
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0, api_key=config["openai_api_key"])
 
 LANGCHAIN_TRACING_V2="true"
 LANGCHAIN_ENDPOINT="https://api.smith.langchain.com"
-LANGCHAIN_API_KEY = os.getenv("LANGCHAIN_API_KEY")
+# LANGCHAIN_API_KEY = os.getenv("LANGCHAIN_API_KEY")
+LANGCHAIN_API_KEY = config["langchain_api_key"]
 LANGCHAIN_PROJECT="database-chatbot"
 
 db = create_db()
