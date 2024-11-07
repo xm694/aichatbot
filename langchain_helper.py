@@ -17,7 +17,7 @@ import dotenv
 import re
 
 
-from conn import create_db
+# from conn import create_db
 
 # configure credentials for openai and langchain
 # dotenv.load_dotenv()
