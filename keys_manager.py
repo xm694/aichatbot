@@ -59,5 +59,5 @@ def get_api_configuration():
         'langchain_api_key': key_manager.get_api_key('langchain'),
         'langchain_tracing_v2': "true",
         'langchain_endpoint': "https://api.smith.langchain.com",
-        'langchain_project': "database-chatbot"
+        # 'langchain_project': "database-chatbot"
     }
